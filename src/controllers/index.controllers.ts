@@ -11,7 +11,7 @@ export const getUser = async (ctx: RouterContext<"/users/:id">) => {
         if (!id) throw new Error("Invalid id");
 
         const user = await client.query(
-            "select * from users where idusers = ? limit 1",
+            "SELECT * FROM users WHERE idusers = ? LIMIT 1",
             [id]
         );
 
@@ -33,7 +33,7 @@ export const getUser = async (ctx: RouterContext<"/users/:id">) => {
 
 export const getUsers = async (ctx: Context) => {
     try {
-        const users = await client.query(`select * from users`);
+        const users = await client.query(`SELECT * FROM users`);
 
         ctx.response.status = 200;
         ctx.response.body = {
@@ -58,7 +58,7 @@ export const deleteUser = async (ctx: RouterContext<"/users/:id">) => {
         if (!id) throw new Error("Invalid id");
 
         let responseDelete = await client.execute(
-            `delete from users where idusers = ? limit 1`,
+            `DELETE FROM users WHERE idusers = ? LIMIT 1`,
             [id]
         );
 
@@ -81,7 +81,7 @@ export const postUser = async (ctx: Context) => {
     try {
         const newUser: User = await ctx.request.body().value;
 
-        await client.execute(`INSERT INTO users(name, country) values(?, ?)`, [
+        await client.execute(`INSERT INTO users(name, country) VALUES(?, ?)`, [
             newUser.name,
             newUser.country,
         ]);
@@ -110,10 +110,11 @@ export const putUser = async (ctx: RouterContext<"/users/:id">) => {
 
         const newData: User = await ctx.request.body().value;
 
-        let responseUpdate = await client.execute(`update users
-            set name = ?, country = ? limit 1`, [
+        let responseUpdate = await client.execute(`UPDATE users
+            SET name = ?, country = ? WHERE (idusers = ?) LIMIT 1`, [
             newData.name,
             newData.country,
+            id
         ]);
 
         if (responseUpdate.affectedRows) {
